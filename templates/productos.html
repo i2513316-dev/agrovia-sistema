@@ -16,11 +16,12 @@
     .catalogo-head h1 {
         margin: 0 0 6px;
         color: #234832;
-        font-size: 30px;
+        font-size: 24px;
     }
 
     .catalogo-head p {
         color: #647368;
+        font-size: 14px;
         margin: 0;
     }
 
@@ -73,6 +74,11 @@
         font-size: 40px;
     }
 
+    /* Imagen e ícono ocupan la misma celda */
+    .producto-foto > * {
+        grid-area: 1 / 1;
+    }
+
     .producto-foto img {
         width: 100%;
         height: 100%;
@@ -94,7 +100,7 @@
     .producto-info h2 {
         margin: 0 0 7px;
         color: #263b2d;
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .producto-info p {
@@ -115,6 +121,28 @@
     }
 </style>
 
+{# Fotos de cada producto (rutas dentro de la carpeta static). Clave: nombre en minúsculas #}
+{% set fotos = {
+    'papa': 'img/papa.png',
+    'choclo': 'img/choclo.png',
+    'haba': 'img/habas.png',
+    'olluco': 'img/productos/olluco.jpg',
+    'ajo': 'img/productos/ajos.jpg',
+    'apio': 'img/productos/apio.jpg',
+    'zanahoria': 'img/productos/zanahoria.jpg',
+    'cebolla': 'img/productos/cebolla.jpg',
+    'lechuga': 'img/productos/lechuga.jpg',
+    'col/repollo': 'img/productos/repollo.jpg',
+    'beterraga': 'img/productos/beterraga.jpg',
+    'acelga': 'img/productos/acelga.jpg',
+    'poro': 'img/productos/poro.jpg',
+    'rábano': 'img/productos/rabano.jpg',
+    'arveja': 'img/productos/arveja.jpg',
+    'quinua': 'img/productos/quinua.jpg',
+    'otro': 'img/productos/otro.jpg',
+    'otros': 'img/productos/otro.jpg'
+} %}
+
 <main class="catalogo">
     <header class="catalogo-head">
         <h1>Catálogo de productos</h1>
@@ -130,14 +158,13 @@
 
     <section class="catalogo-grid" aria-live="polite">
         {% for p in products %}
+        {% set foto = fotos.get(p.nombre|lower) %}
         <article class="producto-card" data-category="{{ p.categoria|lower }}">
             <div class="producto-foto">
-                {% if 'papa' in p.nombre|lower %}
-                <img src="{{ url_for('static', filename='img/papa.png') }}" alt="{{ p.nombre }}" loading="lazy">
-                {% elif 'choclo' in p.nombre|lower %}
-                <img src="{{ url_for('static', filename='img/choclo.png') }}" alt="{{ p.nombre }}" loading="lazy">
-                {% elif 'haba' in p.nombre|lower %}
-                <img src="{{ url_for('static', filename='img/habas.png') }}" alt="{{ p.nombre }}" loading="lazy">
+                {% if foto %}
+                <img src="{{ url_for('static', filename=foto) }}" alt="{{ p.nombre }}" loading="lazy"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <i class="fa-solid fa-leaf" aria-hidden="true" style="display:none;"></i>
                 {% else %}
                 <i class="fa-solid fa-leaf" aria-hidden="true"></i>
                 {% endif %}
