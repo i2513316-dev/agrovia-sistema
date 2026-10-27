@@ -6,12 +6,14 @@ load_dotenv()
 
 def get_connection():
     return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "127.0.0.1"),
-        port=int(os.getenv("DB_PORT", "3306")),
-        database=os.getenv("DB_NAME", "agrovia_v01"),
+        host=os.getenv("DB_HOST", "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"),
+        port=int(os.getenv("DB_PORT", "4000")),
+        database=os.getenv("DB_NAME", "2tjdWwLxpawErDb.root"),
         user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", "")
+        password=os.getenv("DB_PASSWORD" 2NZoG1v6MzN2rflu""),
+        ssl_disabled=os.getenv("DB_SSL", "true").lower() != "true",
     )
+
 
 def query(sql, params=(), one=False):
     conn = get_connection()
