@@ -233,36 +233,21 @@
 
                     <div class="product-image">
 
-                        {% if 'papa' in product.nombre|lower %}
+  {% set nombre = product.nombre|lower %}
+{% set slug = nombre|replace('á','a')|replace('é','e')|replace('í','i')|replace('ó','o')|replace('ú','u')|replace('ñ','n')|replace(' ','_')|replace('/','_') %}
 
-                            <img src="{{ url_for('static', filename='img/papa.png') }}" alt="Papa" />
-
-                        {% elif 'choclo' in product.nombre|lower %}
-
-                            <img src="{{ url_for('static', filename='img/choclo.png') }}" alt="Choclo" />
-
-                        {% elif 'haba' in product.nombre|lower %}
-
-                            <img src="{{ url_for('static', filename='img/habas.png') }}" alt="Habas" />
-
-                        {% elif 'ajo' in product.nombre|lower %}
-
-                            <i class="fa-solid fa-leaf"></i>
-
-                        {% elif 'cebolla' in product.nombre|lower %}
-
-                            <i class="fa-solid fa-circle"></i>
-
-                        {% elif 'zanahoria' in product.nombre|lower %}
-
-                            <i class="fa-solid fa-carrot"></i>
-
-                        {% else %}
-
-                            <i class="fa-solid fa-leaf"></i>
-
-                        {% endif %}
-
+{% if 'papa' in nombre %}
+    <img src="{{ url_for('static', filename='img/papa.png') }}" alt="Papa" />
+{% elif 'choclo' in nombre %}
+    <img src="{{ url_for('static', filename='img/choclo.png') }}" alt="Choclo" />
+{% elif 'haba' in nombre %}
+    <img src="{{ url_for('static', filename='img/habas.png') }}" alt="Habas" />
+{% else %}
+    <img src="{{ url_for('static', filename='img/productos/' ~ slug ~ '.jpg') }}"
+         alt="{{ product.nombre }}"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+    <i class="fa-solid fa-leaf" style="display:none;"></i>
+{% endif %}
                     </div>
 
 
