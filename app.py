@@ -9,9 +9,12 @@ import secrets
 import smtplib
 import ssl
 import uuid
+import urllib.request
+import urllib.error
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation, ROUND_CEILING
 from email.message import EmailMessage
+from email.utils import parseaddr
 from functools import wraps
 
 from flask import (
@@ -152,20 +155,35 @@ def enviar_correo_recuperacion(destinatario, enlace):
     )
 
     try:
-        if usar_ssl:
-            conexion = smtplib.SMTP_SSL(
-                host, puerto, timeout=10, context=ssl.create_default_context()
-            )
-        else:
-            conexion = smtplib.SMTP(host, puerto, timeout=10)
-        with conexion as servidor:
-            if usar_tls:
-                servidor.starttls(context=ssl.create_default_context())
-            if usuario and contrasena:
-                servidor.login(usuario, contrasena)
-            servidor.send_message(mensaje)
+        destinatario = parseaddr(mensaje["To"])[1]
+        remitente = os.getenv("MAIL_FROM") or parseaddr(mensaje["From"])[1]
+        cuerpo = mensaje.get_body(preferencelist=("html", "plain"))
+        contenido = cuerpo.get_content() if cuerpo else ""
+        es_html = bool(cuerpo and cuerpo.get_content_subtype() == "html")
+
+        datos = {
+            "sender": {"name": "Agrovia", "email": remitente},
+            "to": [{"email": destinatario}],
+            "subject": str(mensaje["Subject"] or "Agrovia"),
+            ("htmlContent" if es_html else "textContent"): contenido,
+        }
+        peticion = urllib.request.Request(
+            "https://api.brevo.com/v3/smtp/email",
+            data=json.dumps(datos).encode("utf-8"),
+            headers={
+                "api-key": os.getenv("BREVO_API_KEY", ""),
+                "content-type": "application/json",
+                "accept": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(peticion, timeout=15):
+            pass
         return True
-    except (OSError, smtplib.SMTPException):
+    except urllib.error.HTTPError as error:
+        app.logger.error("Brevo rechazó el correo: %s %s", error.code, error.read().decode("utf-8", "ignore"))
+        return False
+    except Exception:
         app.logger.exception("No se pudo enviar el correo de recuperación.")
         return False
 
