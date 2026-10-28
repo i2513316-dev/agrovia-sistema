@@ -10,36 +10,40 @@
         Ingresa con tu correo o número de documento.
     </p>
 
-    <form method="POST">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-        <label>
-            Correo o documento
-        </label>
+<form method="POST">
 
-        <input
-            type="text"
-            name="login"
-            required
-        >
+    <label>
+        Correo o documento
+    </label>
 
-        <label>
-            Contraseña
-        </label>
+    <input
+        type="text"
+        name="login"
+        required
+    >
 
-        <input
-            type="password"
-            name="password"
-            required
-        >
+    <label>
+        Contraseña
+    </label>
 
-        <button
-            class="btn"
-            type="submit"
-        >
-            Ingresar
-        </button>
+    <input
+        type="password"
+        name="password"
+        required
+    >
 
-    </form>
+    <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+
+    <button
+        class="btn"
+        type="submit"
+    >
+        Ingresar
+    </button>
+
+</form>
 
     <br>
 
