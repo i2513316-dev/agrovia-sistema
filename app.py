@@ -1627,6 +1627,14 @@ def registro():
         apellido_materno = request.form["apellido_materno"].strip()
 
         documento = request.form["numero_documento"].strip()
+                tipo_documento = request.form.get("tipo_documento", "DNI")
+        if tipo_documento not in {"DNI", "CE", "PASAPORTE"}:
+            flash("Selecciona un tipo de documento válido.", "warning")
+            return render_template("registro.html")
+        if tipo_documento == "DNI" and not re.fullmatch(r"\d{8}", documento):
+            flash("El DNI debe tener 8 dígitos.", "warning")
+            return render_template("registro.html")
+            
         telefono = request.form["telefono"].strip()
         correo = request.form["correo"].strip()
 
@@ -1705,7 +1713,7 @@ def registro():
             VALUES
             (
                 %s,
-                'DNI',
+                %s,
                 %s,
                 %s,
                 %s,
