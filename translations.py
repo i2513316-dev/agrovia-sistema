@@ -6,6 +6,8 @@ TRADUCCIONES = {
         "nav.login": "Iniciar sesión",
         "nav.registro": "Registrarse",
         "nav.salir": "Salir",
+        "nav.sobre": "Sobre AgroVía",
+        "nav.notificaciones": "Notificaciones",
 
         "login.titulo": "Iniciar sesión",
         "login.ayuda": "Ingresa con tu correo o número de documento.",
@@ -47,6 +49,8 @@ TRADUCCIONES = {
         "nav.login": "Log in",
         "nav.registro": "Sign up",
         "nav.salir": "Log out",
+        "nav.sobre": "About AgroVía",
+        "nav.notificaciones": "Notifications",
 
         "login.titulo": "Log in",
         "login.ayuda": "Sign in with your email or document number.",
