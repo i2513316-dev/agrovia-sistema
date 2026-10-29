@@ -12,85 +12,47 @@
             Regístrate como productor o comprador.
         </p>
 
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
         <form method="POST">
 
             <label>Nombres</label>
-            <input
-                type="text"
-                name="nombres"
-                required
-            >
+            <input type="text" name="nombres" required>
 
             <label>Apellido paterno</label>
-            <input
-                type="text"
-                name="apellido_paterno"
-                required
-            >
+            <input type="text" name="apellido_paterno" required>
 
             <label>Apellido materno</label>
-            <input
-                type="text"
-                name="apellido_materno"
-            >
+            <input type="text" name="apellido_materno">
 
             <label>Número de documento</label>
-            <input
-                type="text"
-                name="numero_documento"
-                maxlength="20"
-                required
-            >
+            <input type="text" name="numero_documento" maxlength="20" required>
 
             <label>Teléfono</label>
-            <input
-                type="text"
-                name="telefono"
-                maxlength="20"
-                required
-            >
+            <input type="text" name="telefono" maxlength="20" required>
 
             <label>Correo</label>
-            <input
-                type="email"
-                name="correo"
-                required
-            >
+            <input type="email" name="correo" required>
 
             <label>Contraseña</label>
-            <input
-                type="password"
-                name="password"
-                required
-            >
+            <input type="password" name="password" required>
 
             <label>Tipo de usuario</label>
 
             <select name="tipo_persona" required>
-
-                <option value="">
-                    Seleccionar
-                </option>
-
-                <option value="PRODUCTOR">
-                    Productor agrícola
-                </option>
-
-                <option value="COMPRADOR">
-                    Comprador
-                </option>
-
+                <option value="">Seleccionar</option>
+                <option value="PRODUCTOR">Productor agrícola</option>
+                <option value="COMPRADOR">Comprador</option>
             </select>
 
             <label>Código de referido (opcional)</label>
             <input type="text" name="codigo_referido" maxlength="40" placeholder="AGROVIA-USR-00001">
 
+            <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+
             <br><br>
 
-            <button
-                class="btn"
-                type="submit"
-            >
+            <button class="btn" type="submit">
                 Crear cuenta
             </button>
 
