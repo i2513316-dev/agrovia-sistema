@@ -29,6 +29,7 @@ from flask import (
     flash,
     jsonify,
     send_file,
+    response,
 )
 
 from jinja2.ext import Extension
@@ -635,79 +636,59 @@ def guardar_archivo_entidad(archivo, entidad_tipo, entidad_id, id_usuario):
 
     nombre_original = secure_filename(archivo.filename)
     extension = os.path.splitext(nombre_original)[1].lower()
-    extensiones_permitidas = {".jpg", ".jpeg", ".png", ".webp"}
-
-    if extension not in extensiones_permitidas:
+    mimes = {
+        ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+        ".png": "image/png", ".webp": "image/webp",
+    }
+    if extension not in mimes:
         raise ValueError("La imagen debe ser JPG, JPEG, PNG o WEBP.")
 
-    upload_dir = os.path.join(
-        app.static_folder,
-        "uploads",
-        "solicitudes"
+    datos = archivo.read()
+    if not datos:
+        return None
+    if len(datos) > 2 * 1024 * 1024:
+        raise ValueError("La imagen no debe superar 2 MB.")
+
+    id_imagen = execute(
+        """
+        INSERT INTO imagenes_archivo
+            (entidad_tipo, entidad_id, nombre_original, mime_type, datos)
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (entidad_tipo, entidad_id, nombre_original, mimes[extension], datos)
     )
-
-    os.makedirs(upload_dir, exist_ok=True)
-
-    nombre_archivo = f"{uuid.uuid4().hex}{extension}"
-    ruta_guardada = os.path.join(upload_dir, nombre_archivo)
-
-    archivo.save(ruta_guardada)
-
-    ruta_clave = os.path.join(
-        "uploads",
-        "solicitudes",
-        nombre_archivo
-    ).replace("\\", "/")
-
-    codigo = generar_codigo("ARC", "archivos", "codigo_archivo")
+    ruta_clave = f"imagen/{id_imagen}"
 
     execute(
         """
         INSERT INTO archivos
-        (
-            codigo_archivo,
-            tipo_archivo,
-            entidad_tipo,
-            entidad_id,
-            nombre_original,
-            nombre_almacenado,
-            ruta_clave,
-            proveedor_almacenamiento,
-            mime_type,
-            id_usuario_carga,
-            visibilidad,
-            estado
-        )
-        VALUES
-        (
-            %s,
-            %s,
-            %s,
-            %s,
-            %s,
-            %s,
-            %s,
-            'LOCAL',
-            %s,
-            %s,
-            'INTERNO',
-            'ACTIVO'
-        )
+        (codigo_archivo, tipo_archivo, entidad_tipo, entidad_id,
+         nombre_original, nombre_almacenado, ruta_clave,
+         proveedor_almacenamiento, mime_type, id_usuario_carga,
+         visibilidad, estado)
+        VALUES (%s, 'IMAGEN', %s, %s, %s, %s, %s, 'LOCAL', %s, %s, 'INTERNO', 'ACTIVO')
         """,
         (
-            codigo,
-            "IMAGEN",
-            entidad_tipo,
-            entidad_id,
-            nombre_original,
-            nombre_archivo,
-            ruta_clave,
-            archivo.mimetype,
-            id_usuario
+            generar_codigo("ARC", "archivos", "codigo_archivo"),
+            entidad_tipo, entidad_id, nombre_original,
+            str(id_imagen), ruta_clave, mimes[extension], id_usuario
         )
     )
-
     return ruta_clave
+
+
+@app.route("/static/imagen/<int:id_imagen>")
+def imagen_db(id_imagen):
+    fila = query(
+        "SELECT mime_type, datos FROM imagenes_archivo WHERE id_imagen = %s",
+        (id_imagen,),
+        one=True
+    )
+    if not fila:
+        abort(404)
+    respuesta = Response(bytes(fila["datos"]), mimetype=fila["mime_type"])
+    respuesta.headers["Cache-Control"] = "public, max-age=86400"
+    return respuesta
 
 
 def generar_codigo(prefijo, tabla, campo):
@@ -2795,6 +2776,16 @@ def solicitar_lote():
         )
 
         descripcion = request.form["descripcion"]
+                try:
+            precio_productor = Decimal(request.form.get("precio_productor", ""))
+        except InvalidOperation:
+            precio_productor = Decimal("NaN")
+        if not precio_productor.is_finite() or precio_productor <= 0:
+            flash("Indica el precio por kg de tu producto.", "warning")
+            return redirect(url_for("solicitar_lote"))
+        if predio not in {str(p["id_predio"]) for p in predios}:
+            flash("Selecciona uno de tus predios.", "warning")
+            return redirect(url_for("solicitar_lote"))
 
         imagen = request.files.get("imagen")
 
@@ -2816,6 +2807,8 @@ def solicitar_lote():
                 fecha_siembra,
                 fecha_cosecha_estimada_inicio,
                 fecha_cosecha_estimada_fin,
+                descripcion,
+                precio_productor,
                 descripcion,
                 estado
             )
