@@ -1347,7 +1347,7 @@ def index():
 @app.route("/recuperar-cuenta", methods=["GET", "POST"])
 def recuperar_cuenta():
     if request.method == "POST":
-                if not captcha_valido(request):
+        if not captcha_valido(request):
             flash("Completa la verificación de seguridad e inténtalo de nuevo.", "warning")
             return render_template("recuperar_password.html")
         correo = request.form.get("correo", "").strip()
