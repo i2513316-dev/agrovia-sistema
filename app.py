@@ -39,7 +39,7 @@ from dotenv import load_dotenv
 from mysql.connector import Error as MySQLDatabaseError
 
 from db import query, execute, get_connection
-
+from translations import IDIOMAS, traducir
 
 # ==========================================================
 # CONFIGURACIÓN
@@ -1286,6 +1286,38 @@ def common():
         "session_permissions": permisos,
         "turnstile_site_key": os.getenv("TURNSTILE_SITE_KEY", ""),
     }
+
+    return {
+        "session_user": session.get("user_name"),
+        "session_roles": roles,
+        "session_permissions": permisos,
+        "turnstile_site_key": os.getenv("TURNSTILE_SITE_KEY", ""),
+    }
+
+
+@app.context_processor
+def i18n():
+    idioma = session.get("idioma", "es")
+    return {
+        "t": lambda clave: traducir(clave, idioma),
+        "idioma_actual": idioma,
+        "idiomas": IDIOMAS,
+    }
+
+
+@app.route("/idioma/<codigo>")
+def cambiar_idioma(codigo):
+    if codigo in IDIOMAS:
+        session["idioma"] = codigo
+    destino = request.referrer or ""
+    if not destino.startswith(request.host_url):
+        destino = url_for("index")
+    return redirect(destino)
+
+
+# ==========================================================
+# INICIO
+# ==========================================================
 
 
 # ==========================================================
