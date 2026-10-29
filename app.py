@@ -2166,12 +2166,13 @@ def dashboard():
         LEFT JOIN (
             SELECT o.id_lote, SUM(cl.peso_kg) AS comprometido_kg
             FROM operaciones o
+            INNER JOIN (
+                SELECT id_cotizacion_operacion, MAX(id_cotizacion) AS max_id
+                FROM cotizaciones_logisticas
+                GROUP BY id_cotizacion_operacion
+            ) ult ON ult.id_cotizacion_operacion = o.id_cotizacion_operacion
             INNER JOIN cotizaciones_logisticas cl
-                ON cl.id_cotizacion = (
-                    SELECT MAX(cl_actual.id_cotizacion)
-                    FROM cotizaciones_logisticas cl_actual
-                    WHERE cl_actual.id_cotizacion_operacion = o.id_cotizacion_operacion
-                )
+                ON cl.id_cotizacion = ult.max_id
             WHERE o.estado != 'CANCELADA'
               AND cl.peso_kg IS NOT NULL
             GROUP BY o.id_lote
@@ -2179,12 +2180,13 @@ def dashboard():
         LEFT JOIN (
             SELECT r.id_lote, SUM(cl.peso_kg) AS reservado_kg
             FROM reservas_lote r
+            INNER JOIN (
+                SELECT id_cotizacion_operacion, MAX(id_cotizacion) AS max_id
+                FROM cotizaciones_logisticas
+                GROUP BY id_cotizacion_operacion
+            ) ult ON ult.id_cotizacion_operacion = r.id_cotizacion_operacion
             INNER JOIN cotizaciones_logisticas cl
-                ON cl.id_cotizacion = (
-                    SELECT MAX(cl_actual.id_cotizacion)
-                    FROM cotizaciones_logisticas cl_actual
-                    WHERE cl_actual.id_cotizacion_operacion = r.id_cotizacion_operacion
-                )
+                ON cl.id_cotizacion = ult.max_id
             WHERE r.estado = 'ACTIVA'
               AND r.fecha_vencimiento > NOW()
               AND cl.peso_kg IS NOT NULL
