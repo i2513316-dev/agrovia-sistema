@@ -6,62 +6,57 @@
 
     <div class="form">
 
-        <h1>Crear cuenta</h1>
+        <h1>{{ t('reg.titulo') }}</h1>
 
-        <p class="muted">
-            Regístrate como productor o comprador.
-        </p>
+        <p class="muted">{{ t('reg.ayuda') }}</p>
 
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
         <form method="POST">
 
-            <label>Nombres</label>
+            <label>{{ t('reg.nombres') }}</label>
             <input type="text" name="nombres" required>
 
-            <label>Apellido paterno</label>
+            <label>{{ t('reg.ap_paterno') }}</label>
             <input type="text" name="apellido_paterno" required>
 
-            <label>Apellido materno</label>
+            <label>{{ t('reg.ap_materno') }}</label>
             <input type="text" name="apellido_materno">
 
-            <label>Tipo de documento</label>
+            <label>{{ t('reg.tipo_doc') }}</label>
             <select name="tipo_documento" required>
-                <option value="DNI">DNI</option>
-                <option value="CE">Carné de extranjería</option>
-                <option value="PASAPORTE">Pasaporte</option>
+                <option value="DNI">{{ t('reg.doc_dni') }}</option>
+                <option value="CE">{{ t('reg.doc_ce') }}</option>
+                <option value="PASAPORTE">{{ t('reg.doc_pas') }}</option>
             </select>
 
-            <label>Número de documento</label>
+            <label>{{ t('reg.num_doc') }}</label>
             <input type="text" name="numero_documento" maxlength="20" required>
 
-            <label>Teléfono</label>
+            <label>{{ t('reg.telefono') }}</label>
             <input type="text" name="telefono" maxlength="20" required>
 
-            <label>Correo</label>
+            <label>{{ t('reg.correo') }}</label>
             <input type="email" name="correo" required>
 
-            <label>Contraseña</label>
+            <label>{{ t('reg.password') }}</label>
             <input type="password" name="password" required>
 
-            <label>Tipo de usuario</label>
-
+            <label>{{ t('reg.tipo_usuario') }}</label>
             <select name="tipo_persona" required>
-                <option value="">Seleccionar</option>
-                <option value="PRODUCTOR">Productor agrícola</option>
-                <option value="COMPRADOR">Comprador</option>
+                <option value="">{{ t('reg.seleccionar') }}</option>
+                <option value="PRODUCTOR">{{ t('reg.productor') }}</option>
+                <option value="COMPRADOR">{{ t('reg.comprador') }}</option>
             </select>
 
-            <label>Código de referido (opcional)</label>
+            <label>{{ t('reg.referido') }}</label>
             <input type="text" name="codigo_referido" maxlength="40" placeholder="AGROVIA-USR-00001">
 
             <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
 
             <br><br>
 
-            <button class="btn" type="submit">
-                Crear cuenta
-            </button>
+            <button class="btn" type="submit">{{ t('reg.boton') }}</button>
 
         </form>
 
