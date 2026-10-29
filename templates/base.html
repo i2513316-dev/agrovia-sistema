@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ idioma_actual }}">
 
 <head>
     <meta charset="UTF-8">
@@ -1915,27 +1915,24 @@
 
         <div class="nav-links">
 
-            <a
-                class="active"
-                href="{{ url_for('index') }}"
-            >
+             <a class="active" href="{{ url_for('index') }}">
                 <i class="fa-solid fa-house"></i>
-                Inicio
+                {{ t('nav.inicio') }}
             </a>
 
             <a href="{{ url_for('productos') }}">
                 <i class="fa-solid fa-box"></i>
-                Productos
+                {{ t('nav.productos') }}
             </a>
 
             <a href="{{ url_for('lotes') }}">
                 <i class="fa-solid fa-layer-group"></i>
-                Lotes
+                {{ t('nav.lotes') }}
             </a>
 
             <a href="{{ url_for('vida_agrovia') }}">
                 <i class="fa-solid fa-seedling"></i>
-                Sobre AgroVía
+                {{ t('nav.sobre') }}
             </a>
 
             {% if 'PRODUCTOR' in session_roles or 'COMPRADOR' in session_roles %}
@@ -1959,48 +1956,39 @@
 
         <div class="nav-actions">
 
+            {% for codigo, nombre in idiomas.items() %}
+                <a href="{{ url_for('cambiar_idioma', codigo=codigo) }}"
+                   title="{{ nombre }}"
+                   style="{% if codigo == idioma_actual %}font-weight:800;color:#318447{% endif %}">{{ codigo|upper }}</a>
+            {% endfor %}
+
             {% if session_user %}
 
-                <a
-                    class="user-link"
-                    href="{{ url_for('notificaciones') }}"
-                >
+                <a class="user-link" href="{{ url_for('notificaciones') }}">
                     <i class="fa-solid fa-bell"></i>
-                    Notificaciones
+                    {{ t('nav.notificaciones') }}
                 </a>
 
-                <a
-                    class="user-link"
-                    href="{{ url_for('cuenta') }}"
-                >
+                <a class="user-link" href="{{ url_for('cuenta') }}">
                     <i class="fa-solid fa-user"></i>
                     {{ session_user }}
                 </a>
 
-                <a
-                    class="logout"
-                    href="{{ url_for('logout') }}"
-                >
+                <a class="logout" href="{{ url_for('logout') }}">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    Salir
+                    {{ t('nav.salir') }}
                 </a>
 
             {% else %}
 
-                <a
-                    class="btn"
-                    href="{{ url_for('login') }}"
-                >
+                <a class="btn" href="{{ url_for('login') }}">
                     <i class="fa-solid fa-right-to-bracket"></i>
-                    Iniciar sesión
+                    {{ t('nav.login') }}
                 </a>
 
-                <a
-                    class="btn"
-                    href="{{ url_for('registro') }}"
-                >
+                <a class="btn" href="{{ url_for('registro') }}">
                     <i class="fa-solid fa-user-plus"></i>
-                    Registrarse
+                    {{ t('nav.registro') }}
                 </a>
 
             {% endif %}
