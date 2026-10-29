@@ -1619,18 +1619,28 @@ def logout():
 def registro():
 
     if request.method == "POST":
+
         if not captcha_valido(request):
             flash("Completa la verificación de seguridad e inténtalo de nuevo.", "warning")
             return render_template("registro.html")
+
         nombres = request.form["nombres"].strip()
         apellido_paterno = request.form["apellido_paterno"].strip()
         apellido_materno = request.form["apellido_materno"].strip()
 
         documento = request.form["numero_documento"].strip()
-                tipo_documento = request.form.get("tipo_documento", "DNI")
+        tipo_documento = request.form.get("tipo_documento", "DNI")
+        telefono = request.form["telefono"].strip()
+        correo = request.form["correo"].strip()
+
+        password = request.form["password"]
+
+        tipo_persona = request.form["tipo_persona"]
+
         if tipo_documento not in {"DNI", "CE", "PASAPORTE"}:
             flash("Selecciona un tipo de documento válido.", "warning")
             return render_template("registro.html")
+
         if tipo_documento == "DNI" and not re.fullmatch(r"\d{8}", documento):
             flash("El DNI debe tener 8 dígitos.", "warning")
             return render_template("registro.html")
@@ -1727,6 +1737,7 @@ def registro():
             """,
             (
                 codigo,
+                tipo_documento,
                 documento,
                 nombres,
                 apellido_paterno,
