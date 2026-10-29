@@ -11,6 +11,7 @@ import ssl
 import uuid
 import urllib.request
 import urllib.error
+import urllib.parse
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation, ROUND_CEILING
 from email.message import EmailMessage
@@ -187,7 +188,30 @@ def enviar_correo_recuperacion(destinatario, enlace):
         app.logger.exception("No se pudo enviar el correo de recuperación.")
         return False
 
-
+def captcha_valido(req):
+    secreto = os.getenv("TURNSTILE_SECRET", "")
+    if not secreto:
+        return True  # sin clave configurada no bloquea (útil en local)
+    token = req.form.get("cf-turnstile-response", "")
+    if not token:
+        return False
+    datos = urllib.parse.urlencode({
+        "secret": secreto,
+        "response": token,
+        "remoteip": (req.headers.get("X-Forwarded-For", req.remote_addr or "")).split(",")[0].strip(),
+    }).encode("utf-8")
+    try:
+        peticion = urllib.request.Request(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            data=datos,
+            method="POST",
+        )
+        with urllib.request.urlopen(peticion, timeout=10) as r:
+            return bool(json.loads(r.read().decode("utf-8")).get("success"))
+    except Exception:
+        app.logger.exception("No se pudo validar el captcha.")
+        return False
+        
 # ==========================================================
 # FUNCIONES AUXILIARES
 # ==========================================================
@@ -1259,7 +1283,8 @@ def common():
     return {
         "session_user": session.get("user_name"),
         "session_roles": roles,
-        "session_permissions": permisos
+        "session_permissions": permisos,
+        "turnstile_site_key": os.getenv("TURNSTILE_SITE_KEY", ""),
     }
 
 
@@ -1322,6 +1347,9 @@ def index():
 @app.route("/recuperar-cuenta", methods=["GET", "POST"])
 def recuperar_cuenta():
     if request.method == "POST":
+                if not captcha_valido(request):
+            flash("Completa la verificación de seguridad e inténtalo de nuevo.", "warning")
+            return render_template("recuperar_password.html")
         correo = request.form.get("correo", "").strip()
         host_smtp = os.getenv("SMTP_HOST")
         remitente = os.getenv("SMTP_FROM") or os.getenv("SMTP_USER")
@@ -1465,7 +1493,9 @@ def restablecer_password(token):
 def login():
 
     if request.method == "POST":
-
+        if not captcha_valido(request):
+            flash("Completa la verificación de seguridad e inténtalo de nuevo.", "warning")
+            return render_template("login.html")
         login_value = request.form["login"].strip()
         password = request.form["password"]
 
@@ -1589,7 +1619,9 @@ def logout():
 def registro():
 
     if request.method == "POST":
-
+        if not captcha_valido(request):
+            flash("Completa la verificación de seguridad e inténtalo de nuevo.", "warning")
+            return render_template("registro.html")
         nombres = request.form["nombres"].strip()
         apellido_paterno = request.form["apellido_paterno"].strip()
         apellido_materno = request.form["apellido_materno"].strip()
