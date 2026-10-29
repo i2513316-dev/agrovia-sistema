@@ -4,58 +4,35 @@
 
 <div class="form">
 
-    <h2>Iniciar sesión</h2>
+    <h2>{{ t('login.titulo') }}</h2>
 
-    <p class="muted">
-        Ingresa con tu correo o número de documento.
-    </p>
+    <p class="muted">{{ t('login.ayuda') }}</p>
 
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-<form method="POST">
+    <form method="POST">
 
-    <label>
-        Correo o documento
-    </label>
+        <label>{{ t('login.usuario') }}</label>
+        <input type="text" name="login" required>
 
-    <input
-        type="text"
-        name="login"
-        required
-    >
+        <label>{{ t('login.password') }}</label>
+        <input type="password" name="password" required>
 
-    <label>
-        Contraseña
-    </label>
+        <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
 
-    <input
-        type="password"
-        name="password"
-        required
-    >
+        <button class="btn" type="submit">{{ t('login.boton') }}</button>
 
-    <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
-
-    <button
-        class="btn"
-        type="submit"
-    >
-        Ingresar
-    </button>
-
-</form>
+    </form>
 
     <br>
 
     <p>
-        ¿No tienes una cuenta?
-        <a href="{{ url_for('registro') }}">
-            Registrarse
-        </a>
+        {{ t('login.sin_cuenta') }}
+        <a href="{{ url_for('registro') }}">{{ t('nav.registro') }}</a>
     </p>
 
     <p>
-        <a href="{{ url_for('recuperar_cuenta') }}">¿Olvidaste tu contraseña?</a>
+        <a href="{{ url_for('recuperar_cuenta') }}">{{ t('login.olvido') }}</a>
     </p>
 
 </div>
