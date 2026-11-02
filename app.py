@@ -2776,7 +2776,8 @@ def solicitar_lote():
         )
 
         descripcion = request.form["descripcion"]
-                try:
+
+        try:
             precio_productor = Decimal(request.form.get("precio_productor", ""))
         except InvalidOperation:
             precio_productor = Decimal("NaN")
@@ -2786,6 +2787,7 @@ def solicitar_lote():
         if predio not in {str(p["id_predio"]) for p in predios}:
             flash("Selecciona uno de tus predios.", "warning")
             return redirect(url_for("solicitar_lote"))
+
 
         imagen = request.files.get("imagen")
 
