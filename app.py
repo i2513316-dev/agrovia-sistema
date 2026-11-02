@@ -29,7 +29,7 @@ from flask import (
     flash,
     jsonify,
     send_file,
-    response,
+    Response,
 )
 
 from jinja2.ext import Extension
